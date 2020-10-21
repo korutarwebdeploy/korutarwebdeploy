@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>获取模型属性</title>
+    <title>Model Properties Extraction</title>
     <style media="screen">
         * {
             margin: 0;
@@ -52,9 +52,9 @@
 <body>
     <div class='main'>
         <div class='buttons'>
-            <button type="button" class="button" onclick="getComponentProperty()">构件属性</button>
-            <button type="button" class="button" onclick="getFloors()">楼层信息</button>
-            <button type="button" class="button" onclick="getModelTree()">目录树信息</button>
+            <button type="button" class="button" onclick="getComponentProperty()">Element Properties</button>
+            <button type="button" class="button" onclick="getFloors()">Floors Properties</button>
+            <button type="button" class="button" onclick="getModelTree()">Model Tree</button>
         </div>
         <!-- 定义DOM元素，用于在该DOM元素中显示模型或图纸 -->
         <div class='model' id="domId"></div>
@@ -62,11 +62,30 @@
     <script type="text/javascript">
         var viewer3D;
         var app;
-        var viewToken = 'ebcf2abcc1d64b7baa73a64da2f1fe7f';
-        // 初始化显示组件
-        var options = new BimfaceSDKLoaderConfig();
-        options.viewToken = viewToken;
-        BimfaceSDKLoader.load(options, successCallback, failureCallback);
+        var link = "https://api.bimface.com/preview/0ffd730c";
+        function get(url, success) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.onreadystatechange = function () {
+                if ((xhr.readyState == 4 && xhr.status == 200) || xhr.status == 304) {
+                    success(xhr.responseText);
+                }
+            };
+            xhr.send();
+        }
+
+
+        function resolveViewToken(content, success) {
+            var matches = content.match(/viewToken = '.*'/gi);
+            if (matches.length > 0) {
+                var match = matches[0];
+                var viewToken = match
+                    .substr(match.indexOf("=") + 1)
+                    .replace(/(^\s*)|(\s*$)/g, "")
+                    .replace(/'/g, "");
+                if (viewToken) success(viewToken);
+            }
+        }
 
         function successCallback(viewMetaData) {
             if (viewMetaData.viewType == "3DView") {
