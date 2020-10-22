@@ -62,30 +62,11 @@
     <script type="text/javascript">
         var viewer3D;
         var app;
-        var link = "https://api.bimface.com/preview/0ffd730c";
-        function get(url, success) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("GET", url, true);
-            xhr.onreadystatechange = function () {
-                if ((xhr.readyState == 4 && xhr.status == 200) || xhr.status == 304) {
-                    success(xhr.responseText);
-                }
-            };
-            xhr.send();
-        }
-
-
-        function resolveViewToken(content, success) {
-            var matches = content.match(/viewToken = '.*'/gi);
-            if (matches.length > 0) {
-                var match = matches[0];
-                var viewToken = match
-                    .substr(match.indexOf("=") + 1)
-                    .replace(/(^\s*)|(\s*$)/g, "")
-                    .replace(/'/g, "");
-                if (viewToken) success(viewToken);
-            }
-        }
+        var viewToken = 'c757c8b0271d4dc0b4a3fc000022c932';
+        // 初始化显示组件
+        var options = new BimfaceSDKLoaderConfig();
+        options.viewToken = viewToken;
+        BimfaceSDKLoader.load(options, successCallback, failureCallback);
 
         function successCallback(viewMetaData) {
             if (viewMetaData.viewType == "3DView") {
