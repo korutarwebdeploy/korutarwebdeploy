@@ -56,42 +56,206 @@
             <button type="button" class="button" onclick="getFloors()">Floors Properties</button>
             <button type="button" class="button" onclick="getModelTree()">Model Tree Properties</button>
         </div>
+
         <!-- 定义DOM元素，用于在该DOM元素中显示模型或图纸 -->
         <div class='model' id="domId"></div>
     </div>
     <script type="text/javascript">
+        var viewToken = '';
+        // 声明Viewer及App
         var viewer3D;
         var app;
-        var viewToken = 'ebcf2abcc1d64b7baa73a64da2f1fe7f';
-        // 初始化显示组件
-        var options = new BimfaceSDKLoaderConfig();
-        options.viewToken = viewToken;
-        BimfaceSDKLoader.load(options, successCallback, failureCallback);
 
-        function successCallback(viewMetaData) {
-            if (viewMetaData.viewType == "3DView") {
-                // ======== 判断是否为3D模型 ========
-                // 获取DOM元素
+
+
+        // 判断场景是否加载完成
+        var viewAdded = false;
+        // 配置JSSDK加载项
+        function initBimface(viewToken) {
+            var loaderConfig = new BimfaceSDKLoaderConfig();
+            loaderConfig.language = BimfaceLanguageOption.en_GB;
+            loaderConfig.viewToken = viewToken;
+            BimfaceSDKLoader.load(loaderConfig, successCallback, failureCallback);
+
+            // 加载成功回调函数
+            function successCallback(viewMetaData) {
+                loadScript("https://static.bimface.com/attach/eb19d39099ef4cf1b53f333a7066694f_inflate.min.js");
+                loadScript("https://static.bimface.com/attach/9b1a9a0eab054241974a2b1c436921bc_FBXLoader.js");
                 var dom4Show = document.getElementById('domId');
+                // 设置WebApplication3D的配置项
                 var webAppConfig = new Glodon.Bimface.Application.WebApplication3DConfig();
                 webAppConfig.domElement = dom4Show;
-                // 创建WebApplication
+                //背景
+                //webAppConfig.enableIBLBackground=true;
+                //webAppConfig.loadIBLScene={IBLSceneOption: "ParkingLot", withBackground: true}
+                // 创建WebApplication3D，用以显示模型
                 app = new Glodon.Bimface.Application.WebApplication3D(webAppConfig);
-                // 添加待显示的模型
                 app.addView(viewToken);
-                // 从WebApplication获取viewer3D对象
                 viewer3D = app.getViewer();
-                // 监听添加view完成的事件
                 viewer3D.addEventListener(Glodon.Bimface.Viewer.Viewer3DEvent.ViewAdded, function () {
-                    //自适应屏幕大小
-                    window.onresize = function () {
-                        viewer3D.resize(document.documentElement.clientWidth, document.documentElement
-                            .clientHeight - 40);
-                    }
-                    // 调用viewer3D对象的Method，可以继续扩展功能
-                    // 渲染3D模型
-                    viewer3D.render();
+                    viewer3D.enableSkyBox(true);
+                    setCameraStatus()
+                    var drawableConfig = new Glodon.Bimface.Plugins.Drawable.DrawableContainerConfig();
+                    drawableConfig.viewer = viewer3D;
+                    drawableContainer = new Glodon.Bimface.Plugins.Drawable.DrawableContainer(drawableConfig);
+                                        
+                    viewAdded = true;
                 });
+            }
+            // 加载失败回调函数
+            function failureCallback(error) {
+                console.log(error);
+            }
+        }
+
+
+        /*第一步加载你的模型*/
+        var link = "https://api.bimface.com/preview/67458479";
+        function get(url, success) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.onreadystatechange = function () {
+                if ((xhr.readyState == 4 && xhr.status == 200) || xhr.status == 304) {
+                    success(xhr.responseText);
+                }
+            };
+            xhr.send();
+        }
+
+
+        function resolveViewToken(content, success) {
+            var matches = content.match(/viewToken = '.*'/gi);
+            if (matches.length > 0) {
+                var match = matches[0];
+                var viewToken = match
+                    .substr(match.indexOf("=") + 1)
+                    .replace(/(^\s*)|(\s*$)/g, "")
+                    .replace(/'/g, "");
+                if (viewToken) success(viewToken);
+            }
+        }
+
+        function view(publicLink) {
+            get(publicLink, function (content) {
+                resolveViewToken(content, initBimface);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            view(link);
+        });
+        /****************************/
+        /*第二步加载你想要的模型视角*/
+               
+        function setCameraStatus() {
+            viewer3D.setCameraStatus();
+        }
+
+        // ************************** 添加外部构件 **************************
+        // 构件库地址：https://bimface.com/objectlib
+
+        var isExternalObjectAdded = false;
+        var mixer;
+        var action;
+        function addExternalObject() {
+            if (!viewAdded || isExternalObjectAdded) {
+                return;
+            }
+            var fbxUrl = "https://static.bimface.com/attach/4de9cdd471b14b7484bfb00efa68ecf5_Samba%20Dancing.fbx";
+            // 构造FBX加载器
+            var loader = new FBXLoader();
+            // 通过加载器加载资源，获取FBX对象
+            loader.load(fbxUrl, function (object) {
+                // 将该对象添加为外部构件
+                viewer3D.addExternalObject("robot", object);
+                isExternalObjectAdded = true;
+                // 将构件移至初始位置
+                setTransform("robot", new THREE.Vector3(816.7942341517311, 780.7235233162809, -0.019379019705746514), new THREE.Vector3(10, 10, 10), new THREE.Vector3(Math.PI / 2, 0, 0));
+                viewer3D.render();
+                // 构造FBX构件的动画播放器
+                mixer = new THREE.AnimationMixer(object);
+                action = mixer.clipAction(object.animations[0]);
+                action.play();
+            });
+        }
+
+        // 对外部构件进行平移、缩放和旋转
+        function setTransform(name, position, scale, rotation) {
+            // 获取构件对象
+            var object = viewer3D.getExternalObjectByName(name);
+            if (!object) {
+                return;
+            }
+            // 构件平移
+            if (position) {
+                object.position.x += position.x;
+                object.position.y += position.y;
+                object.position.z += position.z;
+            }
+            // 构件缩放
+            if (scale) {
+                object.scale.x *= scale.x;
+                object.scale.y *= scale.y;
+                object.scale.z *= scale.z;
+            }
+            // 构件旋转
+            if (rotation) {
+                object.rotation.x += rotation.x;
+                object.rotation.y += rotation.y;
+                object.rotation.z += rotation.z;
+            }
+            // 更新构件
+            object.updateMatrixWorld();
+            viewer3D.render();
+        }
+
+        // ************************** 设置FBX动画 **************************
+        var isAnimationActivated = false;
+        var animationId;
+        function fbxAnimation() {
+            addExternalObject();
+            //   if (!viewAdded || !isExternalObjectAdded) {
+            //     return;
+            //   }
+            var clock = new THREE.Clock();
+            if (!isAnimationActivated) {
+                function animate() {
+                    animationId = requestAnimationFrame(animate);
+                    var delta = clock.getDelta();
+                    if (mixer) {
+                        mixer.update(delta);
+                        viewer3D.getExternalObjectByName("robot").updateMatrixWorld();
+                        viewer3D.render();
+                    }
+                }
+                animate();
+                isAnimationActivated = true;
+                setButtonText("btnAnimation", "Hide Animation");
+            } else {
+                cancelAnimationFrame(animationId);
+                viewer3D.removeExternalObjectByName("robot")
+                viewer3D.render();
+                isAnimationActivated = false;
+                setButtonText("btnAnimation", "Animation");
+            }
+        }
+
+        // 加载js脚本
+        function loadScript(url, callback) {
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.onload = function () {
+                callback && callback();
+            }
+            script.src = url;
+            document.head.appendChild(script);
+        }
+
+        // ************************** 按钮文字 **************************
+        function setButtonText(btnId, text) {
+            var dom = document.getElementById(btnId);
+            if (dom != null && dom.nodeName == "BUTTON") {
+                dom.innerText = text;
             }
         }
 
