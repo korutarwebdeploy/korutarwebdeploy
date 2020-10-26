@@ -39,7 +39,7 @@
             margin: 5px 0 5px 5px;
             width: 100px;
             height: 30px;
-            background: #11DAB7;
+            background: #FF9933;
             color: #FFFFFF;
             border-radius: 3px;
             border: none;
@@ -261,23 +261,23 @@
                 dom.innerText = text;
             }
         }
-
+        //功能失败回弹
         function failureCallback(error) {
             console.log(error);
         }
-
+        //Element功能驱使
         function getComponentProperty() {
             viewer3D.getComponentProperty("307240", function (objectdata) {
                 alert(JSON.stringify(objectdata));
             });
         }
-
+        //Floor功能驱使
         function getFloors() {
             viewer3D.getFloors(function (objectdata) {
                 alert(JSON.stringify(objectdata));
             });
         }
-
+        //ModelTree功能驱使
         function getModelTree() {
             viewer3D.getModelTree(function (objectdata) {
                 alert(JSON.stringify(objectdata));
