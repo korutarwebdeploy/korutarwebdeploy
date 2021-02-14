@@ -69,8 +69,6 @@
         var viewer3D;
         var app;
 
-
-
         // 判断场景是否加载完成
         var viewAdded = false;
         // 配置JSSDK加载项
@@ -101,7 +99,6 @@
                     var drawableConfig = new Glodon.Bimface.Plugins.Drawable.DrawableContainerConfig();
                     drawableConfig.viewer = viewer3D;
                     drawableContainer = new Glodon.Bimface.Plugins.Drawable.DrawableContainer(drawableConfig);
-                                        
                     viewAdded = true;
                 });
             }
@@ -110,7 +107,6 @@
                 console.log(error);
             }
         }
-
 
         /*第一步加载你的模型*/
         var link = "https://api.bimface.com/preview/eba77d57";
@@ -124,7 +120,6 @@
             };
             xhr.send();
         }
-
 
         function resolveViewToken(content, success) {
             var matches = content.match(/viewToken = '.*'/gi);
@@ -147,9 +142,9 @@
         document.addEventListener("DOMContentLoaded", function () {
             view(link);
         });
+
         /****************************/
         /*第二步加载你想要的模型视角*/
-               
         function setCameraStatus() {
             viewer3D.setCameraStatus();
         }
