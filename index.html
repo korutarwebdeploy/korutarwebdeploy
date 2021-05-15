@@ -211,68 +211,26 @@
 
 
         /**********Export Element Promise Chain 测试区**********/
-        //ExportElement功能驱使--PromiseChain试1
+        //ExportElement功能驱使--PromiseChain
         function exportElement(){
             fetch('https://api.bimface.com/data/v2/files/1981789648390336/elementIds',{
                 headers: {
                     "Content-Type":"application/json",
-                    "Authorization": "Bearer cn-6d051ce5-03d5-4991-9182-9f7ac541f307",
-                },
-                method: 'GET',
-            }).then(function(response) {
-                return response.text(); // pass the data as promise to next then block
-            })
-            // Handle success
-            .then(function(dataIds) {
-                // do stuff with `data`, call second `fetch`
-                return fetch('https://api.bimface.com/data/v2/files/1981789648390336/elements?includeOverrides=true',{
-                    headers: {
-                        "Content-Type":"application/json",
-                        "Authorization": "Bearer cn-6d051ce5-03d5-4991-9182-9f7ac541f307",
-                    },
-                    method: 'POST',
-                    body: JSON.stringify({
-                        "elementIds" : dataIds.split.data(","),
-                        "filter" : [ {
-                            "group" : "default"
-                        }, {
-                            "group" : "shape"
-                        }, {
-                            "group" : "size",
-                            "keys" : [ "length", "width", "a" ]
-                        } ]
-                        })
-                })
-                // Handle success
-                .then(response => response.text())
-                .then(data=> console.log(data))
-                .then(console.log(dataIds))
-            }).catch((err) => {
-                return Promise.reject({ Error: 'Something Went Wrong', err });
-            });
-        }
-
-
-        //ExportElement功能驱使--PromiseChain试2
-        function exportElement2(){
-            fetch('https://api.bimface.com/data/v2/files/1981789648390336/elementIds',{
-                headers: {
-                    "Content-Type":"application/json",
-                    "Authorization": "Bearer cn-6d051ce5-03d5-4991-9182-9f7ac541f307",
+                    "Authorization": "Bearer cn-fc1d2734-4069-485d-a92e-7d073d134928",
                 },
                 method: 'GET',
             }).then(response => response.json())
             .then(retrieveId => {
                 this.retrieveId = retrieveId;
-                const dataIds = [retrieveId].map(retrieveId => retrieveId.data);
+                const dataIds = retrieveId.data;
                 return fetch('https://api.bimface.com/data/v2/files/1981789648390336/elements?includeOverrides=true',{
                 headers: {
                     "Content-Type":"application/json",
-                    "Authorization": "Bearer cn-6d051ce5-03d5-4991-9182-9f7ac541f307",
+                    "Authorization": "Bearer cn-fc1d2734-4069-485d-a92e-7d073d134928",
                 },
                 method: 'POST',
                 body: JSON.stringify({
-                    "elementIds" : {toJSON: dataIds},
+                    "elementIds" : dataIds,
                     "filter" : [ {
                         "group" : "default"
                     }, {
@@ -286,60 +244,10 @@
                 // Handle success
                 .then(response => response.text())
                 .then(data=> console.log(data))
+                .then(console.log(retrieveId))
                 .then(console.log(dataIds))
             }).catch((err) => {
                 return Promise.reject({ Error: 'Something Went Wrong', err });
-            });
-        }
-
-
-        //ExportElement功能驱使--PromiseChain试3
-        function exportElement3(){
-            fetch('https://api.bimface.com/data/v2/files/1981789648390336/elementIds',{
-                headers: {
-                    "Content-Type":"application/json",
-                    "Authorization": "Bearer cn-6d051ce5-03d5-4991-9182-9f7ac541f307",
-                },
-                method: 'GET',
-            }).then(function(response) {
-                return response.text(); // pass the data as promise to next then block
-            })
-            // Handle success
-            .then(function(dataIds) {
-                // do stuff with `data`, call second `fetch`
-                return fetch('https://api.bimface.com/data/v2/files/1981789648390336/elements?includeOverrides=true',{
-                    headers: {
-                        "Content-Type":"application/json",
-                        "Authorization": "Bearer cn-6d051ce5-03d5-4991-9182-9f7ac541f307",
-                    },
-                    method: 'POST',
-                    body: JSON.stringify({
-                        "elementIds" : JSON.parse({dataIds}),
-                        "filter" : [ {
-                            "group" : "default"
-                        }, {
-                            "group" : "shape"
-                        }, {
-                            "group" : "size",
-                            "keys" : [ "length", "width", "a" ]
-                        } ]
-                        })
-                })
-                // Handle success
-                // Convert the data into 'blob'
-                .then((res) => {
-                    return res.blob();
-                })
-                .then((blob) => {
-                    const href = window.URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = href;
-                    link.setAttribute('download', 'ElementData.txt'); //or any other extension
-                    document.body.appendChild(link);
-                    link.click();
-                }).catch((err) => {
-                    return Promise.reject({ Error: 'Something Went Wrong', err });
-                })
             });
         }
 
