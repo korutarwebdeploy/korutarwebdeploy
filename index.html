@@ -219,10 +219,9 @@
                     "Authorization": "Bearer cn-fc1d2734-4069-485d-a92e-7d073d134928",
                 },
                 method: 'GET',
-            }).then(response => response.json())
+            }).then(res => res.json())
             .then(retrieveId => {
-                this.retrieveId = retrieveId;
-                const dataIds = retrieveId.data;
+                let dataIds = retrieveId.data;
                 return fetch('https://api.bimface.com/data/v2/files/1981789648390336/elements?includeOverrides=true',{
                 headers: {
                     "Content-Type":"application/json",
@@ -242,10 +241,18 @@
                     })
                 })
                 // Handle success
-                .then(response => response.text())
-                .then(data=> console.log(data))
-                .then(console.log(retrieveId))
-                .then(console.log(dataIds))
+                // Convert the data into 'blob'
+                .then((res) => {
+                    return res.blob();
+                })
+                .then((blob) => {
+                    const href = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = href;
+                    link.setAttribute('download', 'ElementProp.txt'); //or any other extension
+                    document.body.appendChild(link);
+                    link.click();
+                })
             }).catch((err) => {
                 return Promise.reject({ Error: 'Something Went Wrong', err });
             });
