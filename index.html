@@ -233,10 +233,38 @@
                     "filter" : [ {
                         "group" : "default"
                     }, {
-                        "group" : "shape"
+                        "group":"Other",
+                        "Keys":["Category"]
                     }, {
-                        "group" : "size",
-                        "keys" : [ "length", "width", "a" ]
+                        "group":"Structural",
+                        "Keys":["Structural Usage"]
+                    }, {
+                        "group":"Element Specific",
+                        "keys":["IfcEntity","Name","ObjectType"]
+                    }, {
+                        "group":"Qto_WallBaseQuantities",
+                        "Keys":["Height","Length","NetSideArea","NetVolume","Width"]
+                    }, {
+                        "group":"Qto_SlabBaseQuantities",
+                        "Keys":["GrossArea","GrossVolume","NetArea","NetVolume","Perimeter","Width"]
+                    }, {
+                        "group":"Qto_ColumnBaseQuantities",
+                        "Keys":["CrossSectionArea","GrossVolume","Length","OuterSurfaceArea"]
+                    }, {
+                        "group":"Qto_WindowBaseQuantities",
+                        "Keys":["Area"]
+                    }, {
+                        "group":"Qto_DoorBaseQuantities",
+                        "Keys":["Area"]
+                    }, {
+                        "group":"Dimensions",
+                        "keys":["Area","Slope","Length","Thickness","Volume"]
+                    }, {
+                        "group":"Pset_BuildingElementProxyProvisionForVoid",
+                        "keys":["Width","Height","Depth"]
+                    }, {
+                        "group":"Constraints",
+                        "keys":["Base Constraints","Level","Reference Level"]
                     } ]
                     })
                 })
