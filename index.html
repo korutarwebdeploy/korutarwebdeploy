@@ -49,13 +49,10 @@
     <!--Button的名称设置-->
     <div class='main'>
         <div class='buttons'>
-            <!-- <button type="button" class="button" onclick="getComponentProperty()">Element Properties</button> -->
             <button type="button" class="button" onclick="getFloors()">Floors Properties</button>
             <button type="button" class="button" onclick="getModelTree()">Model Tree Properties</button>
             <button type="button" class="button" onclick="exportElement()">Export Element Properties</button>
             <button type="button" class="button" onclick="elementId()">Download Element IDs</button>
-            <!--<input type="text" size="20" class="valueInput" style="border-top: 50px;" placeholder="Key in your number here">
-            <input type="submit">-->
         </div>
         <!-- 定义DOM元素，用于在该DOM元素中显示模型或图纸 -->
         <div class='model' id="domId"></div>
@@ -65,11 +62,8 @@
     <script src="https://static.bimface.com/api/BimfaceSDKLoader/BimfaceSDKLoader@latest-release.js" charset="utf-8"></script>
     <script type="text/javascript">
         var viewToken = '';
-        // 声明Viewer及App
-        //var viewer3D;
+        // 声明App
         var app;
-        // 判断场景是否加载完成
-        //var viewAdded = false;
         // 配置JSSDK加载项
         function initBimface(viewToken) {
             var loaderConfig = new BimfaceSDKLoaderConfig();
@@ -78,8 +72,6 @@
             BimfaceSDKLoader.load(loaderConfig, successCallback, failureCallback);
             // 加载成功回调函数
             function successCallback(viewMetaData) {
-                //loadScript("https://static.bimface.com/attach/eb19d39099ef4cf1b53f333a7066694f_inflate.min.js");
-                //loadScript("https://static.bimface.com/attach/9b1a9a0eab054241974a2b1c436921bc_FBXLoader.js");
                 var dom4Show = document.getElementById('domId');
                 // 设置WebApplication3D的配置项
                 var webAppConfig = new Glodon.Bimface.Application.WebApplication3DConfig();
@@ -87,15 +79,6 @@
                 // 创建WebApplication3D，用以显示模型
                 app = new Glodon.Bimface.Application.WebApplication3D(webAppConfig);
                 app.addView(viewToken);
-                /*viewer3D = app.getViewer();
-                viewer3D.addEventListener(Glodon.Bimface.Viewer.Viewer3DEvent.ViewAdded, function () {
-                    viewer3D.enableSkyBox(true);
-                    //setCameraStatus()
-                    var drawableConfig = new Glodon.Bimface.Plugins.Drawable.DrawableContainerConfig();
-                    drawableConfig.viewer = viewer3D;
-                    drawableContainer = new Glodon.Bimface.Plugins.Drawable.DrawableContainer(drawableConfig);
-                    viewAdded = true;
-                });*/
             }
             // 加载失败回调函数
             function failureCallback(error) {
@@ -162,12 +145,6 @@
         function failureCallback(error) {
             console.log(error);
         }
-        //Element功能驱使
-        /*function getComponentProperty() {
-            viewer3D.getComponentProperty("307240", function (objectdata) {
-                alert(JSON.stringify(objectdata));
-            });
-        }*/
         //Floor功能驱使
         function getFloors() {
             viewer3D.getFloors(function (objectdata) {
