@@ -5,6 +5,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <title>Model Properties Extraction</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
     <!--基础margin和padding设置，还有基本页面色调-->
     <style media="screen">
         * {
@@ -54,14 +58,10 @@
         }
         #rcorner {
             border-radius: 25px;
-            background: #ffffff;
+            background: #ffffffd0;
             padding: 20px;
             width: 600px;
             height: 450px;
-        }
-        #properties{
-            color:black;
-            font-family: Arial, Helvetica, sans-serif;
         }
 
         /*按钮个性化设置*/
@@ -318,16 +318,16 @@
 		}
 
         /**********AJAX互通web server的content**********/
-        function loadDoc() {
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    document.getElementById("properties").innerHTML = this.responseText;
-                }
-            };
-            xhttp.open("GET", ".\trytext.txt", true);
-            xhttp.send();
-        }
+        fetch('https://glitch.com/edit/#!/shocking-enormous-bill?path=trytext.txt%3A1%3A0',{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'text/plain',
+            },
+        })
+        .then((res) => {
+            return res.text();
+        })
+        .then(returnProp => document.getElementById("properties").innerHTML = returnProp);
 
 
     </script>
